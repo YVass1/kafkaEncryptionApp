@@ -6,6 +6,7 @@ import org.slf4j.{Logger, LoggerFactory}
 
 import java.util.Properties
 import scala.io.Source
+import scala.reflect.io.File
 import scala.util.Random
 
 object ProducerRawMessages extends App {
@@ -32,7 +33,8 @@ object ProducerRawMessages extends App {
     //create producer record
 
     val topic: String = "raw_messages"
-    val value: String = generateRandomWord.toLowerCase
+    val filename: String = "WordList.csv"
+    val value: String = generateRandomWord(filename).toLowerCase
     val key: String = "Key_id " + Integer.toString(i) //CREATE HASH MAP?
 
     val record: ProducerRecord[String, String]
@@ -62,9 +64,9 @@ object ProducerRawMessages extends App {
   //flush and close
   producer.close()
 
-  def generateRandomWord(): String ={
-    val fileString = Source.fromResource("WordList.csv").mkString
-    val wordsList = fileString.split(Array('\n', ',')).map(_.trim.stripPrefix("\"").stripSuffix("\""))
+  def generateRandomWord(inputFile: String): String ={
+    val fileString = Source.fromResource(inputFile).mkString
+    val wordsList = fileString.split(Array('\n', ',',';')).map(_.trim.stripPrefix("\"").stripSuffix("\""))
     val random: Random = new Random()
     val randomNumber = random.nextInt(wordsList.length - 1)
     val randomWord = wordsList(randomNumber)
